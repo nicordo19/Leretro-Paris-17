@@ -1,0 +1,131 @@
+<div class="vitrine">
+  <!-- Image de couverture -->
+  <header class="header-accueil">
+    <img
+      class="image-couvertur"
+      src="assets/imageretro/photo0.png"
+      alt="Devanture du restaurant Le Rétro"
+    />
+  </header>
+
+  <!-- À propos -->
+  <section class="section" id="a-propos">
+    <h2>À propos</h2>
+    <p>
+      Le Rétro est un bistrot parisien niché au cœur du 17ᵉ arrondissement. Il
+      propose une cuisine faite maison dans une ambiance vintage, chaleureuse et
+      conviviale.
+    </p>
+  </section>
+
+  <!-- Boutons de navigation -->
+  <div class="boutons-navigation">
+    <button (click)="afficherSection('photos')">📸 Voir les photos</button>
+    <button (click)="afficherSection('menu')">🍽️ Voir le menu</button>
+    <button (click)="afficherSection('evenements')">🎉 Événements</button>
+    <button (click)="afficherSection('reservation')">
+      📞 Réserver une table
+    </button>
+  </div>
+
+  <!-- Sections conditionnelles -->
+  <div class="section-contenu">
+    <!-- Photos -->
+    <ng-container *ngIf="sectionActive === 'photos'">
+      <h2>Photos du restaurant</h2>
+      <div class="galerie-photos">
+        <img src="assets/imageretro/photo2.webp" alt="Photo 2" />
+        <img src="assets/imageretro/photo9.webp" alt="Photo 9" />
+        <img src="assets/imageretro/photo1.png" alt="Photo 1" />
+        <img src="assets/imageretro/photo3.webp" alt="Photo 3" />
+        <img src="assets/imageretro/photo4.webp" alt="Photo 4" />
+        <img src="assets/imageretro/photo5.webp" alt="Photo 5" />
+        <img src="assets/imageretro/photo6.webp" alt="Photo 6" />
+        <img src="assets/imageretro/photo7.webp" alt="Photo 7" />
+        <img src="assets/imageretro/photo8.webp" alt="Photo 8" />
+      </div>
+    </ng-container>
+
+    <!-- Menu -->
+    <ng-container *ngIf="sectionActive === 'menu'">
+      <section class="section" id="carte">
+        <h2>Nos Cartes</h2>
+        <div class="menus-grid">
+          <div class="menu-container menu-du-jour">
+            <h3>Menu du Jour</h3>
+            <img
+              src="assets/imageretro/menueJour.png"
+              alt="Menu du jour"
+              class="menu-image"
+            />
+          </div>
+          <!-- Emplacement préparé pour la carte principale -->
+          <div class="menu-container carte-principale">
+            <h3>La Carte</h3>
+            <div class="coming-soon">
+              <p>Notre carte complète arrive bientôt !</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </ng-container>
+
+    <!-- Événements -->
+    <ng-container *ngIf="sectionActive === 'evenements'">
+      <section class="section">
+        <h2>Événements</h2>
+        <p>Bientôt disponibles !</p>
+      </section>
+    </ng-container>
+
+    <!-- Réservation -->
+    <ng-container *ngIf="sectionActive === 'reservation'">
+      <section class="section" id="contact">
+        <h2>Réserver une table</h2>
+        <p>📍 <strong>Adresse :</strong> 2 Rue de Tocqueville, 75017 Paris</p>
+        <p>
+          📞 <strong>Téléphone :</strong>
+          <a href="tel:0140189002">01 40 18 90 02</a>
+        </p>
+
+        <button (click)="toggleHours()" class="btn">
+          Afficher les horaires
+        </button>
+
+        <div *ngIf="showHours" class="horaires">
+          <p><strong>Lundi au Samedi :</strong> 09:00 – 01:00</p>
+          <p><strong>Dimanche :</strong> 15:00 – 22:00</p>
+        </div>
+      </section>
+    </ng-container>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>📍 Adresse</h3>
+        <p>2 Rue de Tocqueville<br />75017 Paris</p>
+      </div>
+      <div class="footer-col">
+        <h3>🕒 Horaires</h3>
+        <p>Lundi – Samedi : 09h00 – 01h00<br />Dimanche : 15h00 – 22h00</p>
+      </div>
+      <div class="footer-col">
+        <h3>📞 Contact</h3>
+        <p><a href="tel:0140189002">01 40 18 90 02</a><br /></p>
+      </div>
+      <div class="footer-col">
+        <h3>🔗 Suivez-nous</h3>
+        <p>
+          <a href="#">Instagram</a><br />
+          <a href="#">Facebook</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2025 Le Rétro Paris — Tous droits réservés</p>
+    </div>
+  </footer>
+</div>
