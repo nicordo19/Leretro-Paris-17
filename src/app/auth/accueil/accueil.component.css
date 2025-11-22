@@ -4,15 +4,14 @@
 .vitrine {
   font-family: "Georgia", serif;
   color: #222;
-  background-color: #fff;
+  background-color: #6d4b0366;
 }
 
 .image-couvertur {
   width: 100%;
   height: 60vh; /* ✅ hauteur visible réduite à 60% de l'écran */
-  object-fit: cover;
+
   object-position: center;
-  border-bottom: 4px solid #000;
 }
 
 /* SECTIONS */
@@ -384,4 +383,61 @@ ul li {
   .footer-col {
     font-size: 0.9em;
   }
+}
+/* === CAROUSEL COUVERTURE - Animation FLUIDE === */
+
+/* Conteneur */
+/* GRAND ÉCRAN (Mac, PC, TV) */
+.header-accueil {
+  height: 85vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* TABLETTE */
+@media (max-width: 2022px) {
+  .header-accueil {
+    height: 70vh;
+  }
+}
+@media (max-width: 1024px) {
+  .header-accueil {
+    height: 70vh;
+  }
+}
+
+/* SMARTPHONE (iPhone, Android) */
+@media (max-width: 768px) {
+  .header-accueil {
+    height: 55vh; /* réglage idéal */
+  }
+}
+
+/* PETIT SMARTPHONE */
+@media (max-width: 480px) {
+  .header-accueil {
+    height: 40vh;
+  }
+}
+
+/* TRÈS PETIT ÉCRAN */
+@media (max-width: 349px) {
+  .header-accueil {
+    height: 38vh;
+  }
+}
+
+/* Image animée */
+.carousel-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  transform: translateX(0);
+  transition: transform 0.9 ease-in-out;
 }

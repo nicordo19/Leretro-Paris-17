@@ -2,15 +2,20 @@
   <!-- Image de couverture -->
   <header class="header-accueil">
     <img
-      class="image-couvertur"
-      src="assets/imageretro/photo0.png"
-      alt="Devanture du restaurant Le Rétro"
+      class="image-couvertur carousel-img"
+      appCarouselCover
+      [carouselImages]="[
+        'assets/imageretro/Retro-face2.jpg',
+        'assets/imageretro/Retro-histoir.jpg',
+        'assets/imageretro/Retro-barman.jpg',
+        'assets/imageretro/Retro-cafe.jpg'
+      ]"
+      alt="Photos du restaurant Le Rétro"
     />
   </header>
-
   <!-- À propos -->
   <section class="section" id="a-propos">
-    <h2>À propos</h2>
+    <h2>LE RETRO</h2>
     <p>
       Le Rétro est un bistrot parisien niché au cœur du 17ᵉ arrondissement. Il
       propose une cuisine faite maison dans une ambiance vintage, chaleureuse et
@@ -34,15 +39,18 @@
     <ng-container *ngIf="sectionActive === 'photos'">
       <h2>Photos du restaurant</h2>
       <div class="galerie-photos">
-        <img src="assets/imageretro/photo2.webp" alt="Photo 2" />
+        <img src="assets/imageretro/Retro-server2.jpg" alt="Serveur" />
+        <img src="assets/imageretro/Retro-server.jpg" alt="Serveur2" />
+        <img src="assets/imageretro/photo8.webp" alt="barman" />
+        <img src="assets/imageretro/Retro-plat.jpg" alt="Plat" />
         <img src="assets/imageretro/photo9.webp" alt="Photo 9" />
         <img src="assets/imageretro/photo1.png" alt="Photo 1" />
-        <img src="assets/imageretro/photo3.webp" alt="Photo 3" />
-        <img src="assets/imageretro/photo4.webp" alt="Photo 4" />
+
         <img src="assets/imageretro/photo5.webp" alt="Photo 5" />
-        <img src="assets/imageretro/photo6.webp" alt="Photo 6" />
+        <img src="assets/imageretro/Retro-face.jpg" alt="Face" />
         <img src="assets/imageretro/photo7.webp" alt="Photo 7" />
-        <img src="assets/imageretro/photo8.webp" alt="Photo 8" />
+
+        <img src="assets/imageretro/Retro-bar.jpg" alt="bar" />
       </div>
     </ng-container>
 

@@ -1,12 +1,12 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import {CommonModule} from '@angular/common';
-
+import { CarouselCover } from '../../carousel-cover';
 @Component({
   selector: 'app-accueil.component',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CarouselCover],
   templateUrl: './accueil.component.html',
-  styleUrl: './accueil.component.css'
+  styleUrl: './accueil.component.css',
 })
 export class AccueilComponent {
   showHours = false;
