@@ -1,4 +1,12 @@
 <div class="admin-container">
+  <!-- Messages de feedback -->
+  <div *ngIf="successMessage" class="message success-message">
+    ✅ {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="message error-message">
+    ❌ {{ errorMessage }}
+  </div>
+
   <!-- Authentification -->
   <div *ngIf="!isAuthenticated" class="login-section">
     <h1>🔐 Accès Admin</h1>

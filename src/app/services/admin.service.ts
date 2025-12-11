@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { StorageService } from './storage.service';
 
+/**
+ * Interface représentant une photo avec ses métadonnées
+ */
 export interface Photo {
   id: string;
   src: string;
@@ -8,6 +13,11 @@ export interface Photo {
   category: 'header' | 'photos' | 'evenements';
 }
 
+/**
+ * Service de gestion des photos et images du carousel.
+ * Persiste les données via StorageService (localStorage) avec gestion d'erreurs.
+ * Utilise RxJS BehaviorSubjects pour la réactivité.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -18,32 +28,61 @@ export class AdminService {
   private headerImagesSubject = new BehaviorSubject<string[]>([]);
   public headerImages$ = this.headerImagesSubject.asObservable();
 
-  constructor() {
+  constructor(private storage: StorageService) {
     this.loadPhotos();
   }
 
+  /**
+   * Charge les photos depuis le stockage ou initialise avec les valeurs par défaut
+   */
   private loadPhotos(): void {
-    // Récupérer depuis localStorage ou initialiser avec les valeurs par défaut
-    const savedPhotos = localStorage.getItem('retro_photos');
-    const savedHeader = localStorage.getItem('retro_header');
+    try {
+      // Charger les photos
+      const savedPhotos = this.storage.getItem<Photo[]>(
+        'photos',
+        []
+      );
 
-    if (savedPhotos) {
-      this.photosSubject.next(JSON.parse(savedPhotos));
-    } else {
+      if (savedPhotos && savedPhotos.length > 0) {
+        this.photosSubject.next(savedPhotos);
+      } else {
+        this.initDefaultPhotos();
+      }
+
+      // Charger les images du header
+      const savedHeader = this.storage.getItem<string[]>(
+        'headerImages',
+        []
+      );
+
+      if (savedHeader && savedHeader.length > 0) {
+        this.headerImagesSubject.next(savedHeader);
+      } else {
+        this.initDefaultHeaderImages();
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des photos', error);
       this.initDefaultPhotos();
-    }
-
-    if (savedHeader) {
-      this.headerImagesSubject.next(JSON.parse(savedHeader));
-    } else {
-      this.headerImagesSubject.next([
-        'assets/imageretro/header/Retro-face2.jpg',
-        'assets/imageretro/header/remi.png',
-        'assets/imageretro/header/Retro-cafe.jpg',
-      ]);
+      this.initDefaultHeaderImages();
     }
   }
 
+  /**
+   * Initialise les images du header avec les valeurs par défaut
+   */
+  private initDefaultHeaderImages(): void {
+    const defaultHeader = [
+      'assets/imageretro/header/Retro-face2.jpg',
+      'assets/imageretro/header/remi.png',
+      'assets/imageretro/header/Retro-cafe.jpg',
+    ];
+    this.headerImagesSubject.next(defaultHeader);
+    this.updateHeaderImages(defaultHeader);
+  }
+
+  /**
+   * Initialise les photos par défaut (photos du restaurant)
+   */
   private initDefaultPhotos(): void {
     const defaultPhotos: Photo[] = [
       {
@@ -129,10 +168,19 @@ export class AdminService {
     this.savePhotos(defaultPhotos);
   }
 
+  /**
+   * Récupère toutes les photos
+   * @returns Observable de toutes les photos
+   */
   getPhotos(): Observable<Photo[]> {
     return this.photos$;
   }
 
+  /**
+   * Récupère les photos filtrées par catégorie
+   * @param category - Catégorie de photos à récupérer
+   * @returns Observable des photos de la catégorie spécifiée
+   */
   getPhotosByCategory(
     category: 'header' | 'photos' | 'evenements'
   ): Observable<Photo[]> {
@@ -143,37 +191,87 @@ export class AdminService {
     });
   }
 
+  /**
+   * Récupère les images du header
+   * @returns Observable des images du header
+   */
   getHeaderImages(): Observable<string[]> {
     return this.headerImages$;
   }
 
+  /**
+   * Ajoute une nouvelle photo
+   * @param photo - La photo à ajouter
+   */
   addPhoto(photo: Photo): void {
-    const current = this.photosSubject.value;
-    const updated = [...current, { ...photo, id: Date.now().toString() }];
-    this.photosSubject.next(updated);
-    this.savePhotos(updated);
+    try {
+      const current = this.photosSubject.value;
+      const updated = [...current, { ...photo, id: Date.now().toString() }];
+      this.photosSubject.next(updated);
+      this.savePhotos(updated);
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de la photo', error);
+      throw new Error('Impossible d\'ajouter la photo');
+    }
   }
 
+  /**
+   * Mets à jour une photo existante
+   * @param id - ID de la photo à modifier
+   * @param photo - Les propriétés à mettre à jour
+   */
   updatePhoto(id: string, photo: Partial<Photo>): void {
-    const current = this.photosSubject.value;
-    const updated = current.map((p) => (p.id === id ? { ...p, ...photo } : p));
-    this.photosSubject.next(updated);
-    this.savePhotos(updated);
+    try {
+      const current = this.photosSubject.value;
+      const updated = current.map((p) => (p.id === id ? { ...p, ...photo } : p));
+      this.photosSubject.next(updated);
+      this.savePhotos(updated);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la photo', error);
+      throw new Error('Impossible de mettre à jour la photo');
+    }
   }
 
+  /**
+   * Supprime une photo
+   * @param id - ID de la photo à supprimer
+   */
   deletePhoto(id: string): void {
-    const current = this.photosSubject.value;
-    const updated = current.filter((p) => p.id !== id);
-    this.photosSubject.next(updated);
-    this.savePhotos(updated);
+    try {
+      const current = this.photosSubject.value;
+      const updated = current.filter((p) => p.id !== id);
+      this.photosSubject.next(updated);
+      this.savePhotos(updated);
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la photo', error);
+      throw new Error('Impossible de supprimer la photo');
+    }
   }
 
+  /**
+   * Mets à jour les images du carousel header
+   * @param images - Tableau des URLs des images
+   */
   updateHeaderImages(images: string[]): void {
-    this.headerImagesSubject.next(images);
-    localStorage.setItem('retro_header', JSON.stringify(images));
+    try {
+      this.headerImagesSubject.next(images);
+      this.storage.setItem('headerImages', images);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du header', error);
+      throw new Error('Impossible de mettre à jour les images du header');
+    }
   }
 
+  /**
+   * Sauvegarde les photos dans le stockage
+   * @param photos - Tableau des photos à sauvegarder
+   */
   private savePhotos(photos: Photo[]): void {
-    localStorage.setItem('retro_photos', JSON.stringify(photos));
+    try {
+      this.storage.setItem('photos', photos);
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde des photos', error);
+      // On laisse passer l'erreur car elle est loggée par StorageService
+    }
   }
 }
