@@ -20,6 +20,25 @@ export class AccueilComponent implements OnInit {
   lightboxImage = '';
   lightboxAlt = '';
 
+  // Menus avec images
+  menus = [
+    {
+      title: 'Menu du Jour',
+      src: 'assets/imageretro/menu/menueJour.png',
+      alt: 'Menu du jour',
+    },
+    {
+      title: 'La Carte - Boissons',
+      src: 'assets/imageretro/menu/LeRetro-Carte-Boisson.png',
+      alt: 'Menu boisson',
+    },
+    {
+      title: 'La Carte - Nos Classiques',
+      src: 'assets/imageretro/menu/LeRetro-carte-NosClassiques.png',
+      alt: 'Menu nos classiques',
+    },
+  ];
+
   constructor(private adminService: AdminService) {}
 
   ngOnInit(): void {
@@ -60,6 +79,16 @@ export class AccueilComponent implements OnInit {
   ouvrirLightbox(photo: Photo) {
     this.lightboxImage = photo.src;
     this.lightboxAlt = photo.alt;
+    this.lightboxActive = true;
+  }
+
+  /**
+   * Ouvre le lightbox avec une image de menu
+   * @param menu - Objet menu contenant src et alt
+   */
+  ouvrirLightboxMenu(menu: any) {
+    this.lightboxImage = menu.src;
+    this.lightboxAlt = menu.alt;
     this.lightboxActive = true;
   }
 

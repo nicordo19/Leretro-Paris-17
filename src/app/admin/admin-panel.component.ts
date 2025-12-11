@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AdminService, Photo } from '../services/admin.service';
 import { environment } from '../../environments/environment';
+import { AdminService, Photo } from '../services/admin.service';
 
 /**
  * Composant d'administration pour la gestion des photos et du carousel
@@ -144,8 +144,8 @@ export class AdminPanelComponent implements OnInit {
       this.showSuccess('Photo ajoutée avec succès');
       this.loadData();
     } catch (error) {
-      console.error('Erreur lors de l\'ajout de la photo', error);
-      this.showError('Erreur lors de l\'ajout de la photo');
+      console.error("Erreur lors de l'ajout de la photo", error);
+      this.showError("Erreur lors de l'ajout de la photo");
     } finally {
       this.isLoading = false;
     }
@@ -208,8 +208,8 @@ export class AdminPanelComponent implements OnInit {
       this.showSuccess('Image ajoutée au carousel');
       this.loadData();
     } catch (error) {
-      console.error('Erreur lors de l\'ajout de l\'image', error);
-      this.showError('Erreur lors de l\'ajout de l\'image');
+      console.error("Erreur lors de l'ajout de l'image", error);
+      this.showError("Erreur lors de l'ajout de l'image");
     }
   }
 
@@ -224,8 +224,8 @@ export class AdminPanelComponent implements OnInit {
       this.showSuccess('Image supprimée du carousel');
       this.loadData();
     } catch (error) {
-      console.error('Erreur lors de la suppression de l\'image', error);
-      this.showError('Erreur lors de la suppression de l\'image');
+      console.error("Erreur lors de la suppression de l'image", error);
+      this.showError("Erreur lors de la suppression de l'image");
     }
   }
 
@@ -283,7 +283,9 @@ export class AdminPanelComponent implements OnInit {
   private validateFile(file: File): void {
     if (file.size > environment.upload.maxFileSize) {
       throw new Error(
-        `Fichier trop volumineux. Maximum: ${environment.upload.maxFileSize / 1024 / 1024}MB`
+        `Fichier trop volumineux. Maximum: ${
+          environment.upload.maxFileSize / 1024 / 1024
+        }MB`
       );
     }
 
@@ -316,7 +318,7 @@ export class AdminPanelComponent implements OnInit {
             this.loadData();
           }
         } catch (error) {
-          console.error('Erreur lors de l\'encodage du fichier', error);
+          console.error("Erreur lors de l'encodage du fichier", error);
           this.showError('Erreur lors du traitement du fichier');
         } finally {
           this.isLoading = false;
@@ -330,8 +332,8 @@ export class AdminPanelComponent implements OnInit {
 
       reader.readAsDataURL(this.newHeaderImageFile);
     } catch (error) {
-      console.error('Erreur lors de l\'upload du carousel', error);
-      this.showError('Erreur lors de l\'upload');
+      console.error("Erreur lors de l'upload du carousel", error);
+      this.showError("Erreur lors de l'upload");
       this.isLoading = false;
     }
   }
@@ -362,16 +364,23 @@ export class AdminPanelComponent implements OnInit {
               id: Date.now().toString(),
               src: base64Image,
               alt: this.newPhoto.alt || '',
-              category: this.newPhoto.category as 'header' | 'photos' | 'evenements',
+              category: this.newPhoto.category as
+                | 'header'
+                | 'photos'
+                | 'evenements',
             };
             this.adminService.addPhoto(photo);
             this.clearFileUpload();
-            this.newPhoto = { src: '', alt: '', category: this.selectedCategory };
+            this.newPhoto = {
+              src: '',
+              alt: '',
+              category: this.selectedCategory,
+            };
             this.showSuccess('Photo ajoutée avec succès');
             this.loadData();
           }
         } catch (error) {
-          console.error('Erreur lors de l\'encodage du fichier', error);
+          console.error("Erreur lors de l'encodage du fichier", error);
           this.showError('Erreur lors du traitement du fichier');
         } finally {
           this.isLoading = false;
@@ -385,8 +394,8 @@ export class AdminPanelComponent implements OnInit {
 
       reader.readAsDataURL(this.newPhotoFile);
     } catch (error) {
-      console.error('Erreur lors de l\'upload de la photo', error);
-      this.showError('Erreur lors de l\'upload');
+      console.error("Erreur lors de l'upload de la photo", error);
+      this.showError("Erreur lors de l'upload");
       this.isLoading = false;
     }
   }

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { StorageService } from './storage.service';
 
 /**
@@ -38,10 +37,7 @@ export class AdminService {
   private loadPhotos(): void {
     try {
       // Charger les photos
-      const savedPhotos = this.storage.getItem<Photo[]>(
-        'photos',
-        []
-      );
+      const savedPhotos = this.storage.getItem<Photo[]>('photos', []);
 
       if (savedPhotos && savedPhotos.length > 0) {
         this.photosSubject.next(savedPhotos);
@@ -50,10 +46,7 @@ export class AdminService {
       }
 
       // Charger les images du header
-      const savedHeader = this.storage.getItem<string[]>(
-        'headerImages',
-        []
-      );
+      const savedHeader = this.storage.getItem<string[]>('headerImages', []);
 
       if (savedHeader && savedHeader.length > 0) {
         this.headerImagesSubject.next(savedHeader);
@@ -210,8 +203,8 @@ export class AdminService {
       this.photosSubject.next(updated);
       this.savePhotos(updated);
     } catch (error) {
-      console.error('Erreur lors de l\'ajout de la photo', error);
-      throw new Error('Impossible d\'ajouter la photo');
+      console.error("Erreur lors de l'ajout de la photo", error);
+      throw new Error("Impossible d'ajouter la photo");
     }
   }
 
@@ -223,7 +216,9 @@ export class AdminService {
   updatePhoto(id: string, photo: Partial<Photo>): void {
     try {
       const current = this.photosSubject.value;
-      const updated = current.map((p) => (p.id === id ? { ...p, ...photo } : p));
+      const updated = current.map((p) =>
+        p.id === id ? { ...p, ...photo } : p
+      );
       this.photosSubject.next(updated);
       this.savePhotos(updated);
     } catch (error) {

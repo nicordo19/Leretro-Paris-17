@@ -4,7 +4,7 @@
  */
 export const environment = {
   production: false,
-  
+
   // Admin Configuration
   admin: {
     password: 'LeRetro2025', // Change this for production!

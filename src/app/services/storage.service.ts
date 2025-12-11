@@ -26,7 +26,10 @@ export class StorageService {
       const serialized = JSON.stringify(value);
       localStorage.setItem(storageKey, serialized);
     } catch (error) {
-      console.error(`Failed to save data to localStorage for key "${key}":`, error);
+      console.error(
+        `Failed to save data to localStorage for key "${key}":`,
+        error
+      );
       throw new Error(`Storage error: Unable to save ${key}`);
     }
   }
@@ -42,14 +45,17 @@ export class StorageService {
     try {
       const storageKey = this.storageKeys[key];
       const item = localStorage.getItem(storageKey);
-      
+
       if (item === null) {
         return defaultValue;
       }
-      
+
       return JSON.parse(item) as T;
     } catch (error) {
-      console.error(`Failed to retrieve data from localStorage for key "${key}":`, error);
+      console.error(
+        `Failed to retrieve data from localStorage for key "${key}":`,
+        error
+      );
       return defaultValue;
     }
   }
@@ -63,7 +69,10 @@ export class StorageService {
       const storageKey = this.storageKeys[key];
       localStorage.removeItem(storageKey);
     } catch (error) {
-      console.error(`Failed to remove data from localStorage for key "${key}":`, error);
+      console.error(
+        `Failed to remove data from localStorage for key "${key}":`,
+        error
+      );
     }
   }
 

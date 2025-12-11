@@ -61,30 +61,29 @@
       <section class="section" id="carte">
         <h2>Nos Cartes</h2>
         <div class="menus-grid">
-          <div class="menu-container menu-du-jour">
-            <h3>Menu du Jour</h3>
-            <img
-              src="assets/imageretro/menu/menueJour.png"
-              alt="Menu du jour"
-              class="menu-image"
-            />
+          <div
+            class="menu-container menu-du-jour"
+            *ngFor="let menu of menus"
+            (click)="ouvrirLightboxMenu(menu)"
+            style="cursor: pointer;"
+          >
+            <h3>{{ menu.title }}</h3>
+            <img [src]="menu.src" [alt]="menu.alt" class="menu-image" />
+            <p style="font-size: 12px; color: #888; margin-top: 10px;">
+              🔍 Cliquez pour agrandir
+            </p>
           </div>
-          <!-- Emplacement préparé pour la carte principale -->
-          <div class="menu-container carte-principale">
-            <h3>La Carte</h3>
-            <img
-              src="assets/imageretro/menu/LeRetro-Carte-Boisson.png"
-              alt="Menu boisson"
-              class="menu-image"
-            />
-          </div>
-          <div class="menu-container carte-principale">
-            <h3>La Carte</h3>
-            <img
-              src="assets/imageretro/menu/LeRetro-carte-NosClassiques.png"
-              alt="Menu boisson"
-              class="menu-image"
-            />
+        </div>
+        <div class="lightbox" *ngIf="lightboxActive" (click)="fermerLightbox()">
+          <div class="lightbox-content">
+            <button
+              class="lightbox-close"
+              aria-label="Fermer la photo agrandie"
+              (click)="fermerLightbox($event)"
+            >
+              ×
+            </button>
+            <img [src]="lightboxImage" [alt]="lightboxAlt" />
           </div>
         </div>
       </section>
