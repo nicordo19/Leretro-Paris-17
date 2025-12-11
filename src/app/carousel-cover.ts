@@ -49,7 +49,7 @@ export class CarouselCoverDirective implements OnInit {
           img.classList.remove('carousel-slide-in-active');
         }, 900);
       }, 900);
-    }, 10000);
+    }, 5000);
   }
 }
 export const CarouselCover = CarouselCoverDirective;

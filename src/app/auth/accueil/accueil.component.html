@@ -4,12 +4,7 @@
     <img
       class="image-couvertur carousel-img"
       appCarouselCover
-      [carouselImages]="[
-        'assets/imageretro/Retro-face2.jpg',
-        'assets/imageretro/Retro-histoir.jpg',
-        'assets/imageretro/Retro-barman.jpg',
-        'assets/imageretro/Retro-cafe.jpg'
-      ]"
+      [carouselImages]="headerImages"
       alt="Photos du restaurant Le Rétro"
     />
   </header>
@@ -39,18 +34,25 @@
     <ng-container *ngIf="sectionActive === 'photos'">
       <h2>Photos du restaurant</h2>
       <div class="galerie-photos">
-        <img src="assets/imageretro/Retro-server2.jpg" alt="Serveur" />
-        <img src="assets/imageretro/Retro-server.jpg" alt="Serveur2" />
-        <img src="assets/imageretro/photo8.webp" alt="barman" />
-        <img src="assets/imageretro/Retro-plat.jpg" alt="Plat" />
-        <img src="assets/imageretro/photo9.webp" alt="Photo 9" />
-        <img src="assets/imageretro/photo1.png" alt="Photo 1" />
-
-        <img src="assets/imageretro/photo5.webp" alt="Photo 5" />
-        <img src="assets/imageretro/Retro-face.jpg" alt="Face" />
-        <img src="assets/imageretro/photo7.webp" alt="Photo 7" />
-
-        <img src="assets/imageretro/Retro-bar.jpg" alt="bar" />
+        <figure
+          class="galerie-item"
+          *ngFor="let photo of photos"
+          (click)="ouvrirLightbox(photo)"
+        >
+          <img [src]="photo.src" [alt]="photo.alt" />
+        </figure>
+      </div>
+      <div class="lightbox" *ngIf="lightboxActive" (click)="fermerLightbox()">
+        <div class="lightbox-content">
+          <button
+            class="lightbox-close"
+            aria-label="Fermer la photo agrandie"
+            (click)="fermerLightbox($event)"
+          >
+            ×
+          </button>
+          <img [src]="lightboxImage" [alt]="lightboxAlt" />
+        </div>
       </div>
     </ng-container>
 
@@ -62,7 +64,7 @@
           <div class="menu-container menu-du-jour">
             <h3>Menu du Jour</h3>
             <img
-              src="assets/imageretro/menueJour.png"
+              src="assets/imageretro/menu/menueJour.png"
               alt="Menu du jour"
               class="menu-image"
             />
@@ -70,9 +72,19 @@
           <!-- Emplacement préparé pour la carte principale -->
           <div class="menu-container carte-principale">
             <h3>La Carte</h3>
-            <div class="coming-soon">
-              <p>Notre carte complète arrive bientôt !</p>
-            </div>
+            <img
+              src="assets/imageretro/menu/LeRetro-Carte-Boisson.png"
+              alt="Menu boisson"
+              class="menu-image"
+            />
+          </div>
+          <div class="menu-container carte-principale">
+            <h3>La Carte</h3>
+            <img
+              src="assets/imageretro/menu/LeRetro-carte-NosClassiques.png"
+              alt="Menu boisson"
+              class="menu-image"
+            />
           </div>
         </div>
       </section>
@@ -82,7 +94,28 @@
     <ng-container *ngIf="sectionActive === 'evenements'">
       <section class="section">
         <h2>Événements</h2>
-        <p>Bientôt disponibles !</p>
+        <p>Afterworks, privatisations, soirées ? : Contactez-Nous.</p>
+        <div class="galerie-photos">
+          <figure
+            class="galerie-item"
+            *ngFor="let photo of photosEvenements"
+            (click)="ouvrirLightbox(photo)"
+          >
+            <img [src]="photo.src" [alt]="photo.alt" />
+          </figure>
+        </div>
+        <div class="lightbox" *ngIf="lightboxActive" (click)="fermerLightbox()">
+          <div class="lightbox-content">
+            <button
+              class="lightbox-close"
+              aria-label="Fermer la photo agrandie"
+              (click)="fermerLightbox($event)"
+            >
+              ×
+            </button>
+            <img [src]="lightboxImage" [alt]="lightboxAlt" />
+          </div>
+        </div>
       </section>
     </ng-container>
 
@@ -126,8 +159,8 @@
       <div class="footer-col">
         <h3>🔗 Suivez-nous</h3>
         <p>
-          <a href="#">Instagram</a><br />
-          <a href="#">Facebook</a>
+          <a href="#"><i class="fab fa-instagram"></i> Instagram</a><br />
+          <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
         </p>
       </div>
     </div>

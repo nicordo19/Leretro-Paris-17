@@ -1,0 +1,178 @@
+<div class="admin-container">
+  <!-- Authentification -->
+  <div *ngIf="!isAuthenticated" class="login-section">
+    <h1>🔐 Accès Admin</h1>
+    <div class="login-form">
+      <input
+        type="password"
+        [(ngModel)]="password"
+        placeholder="Entrer le mot de passe"
+        (keyup.enter)="login()"
+      />
+      <button (click)="login()" class="btn-login">Se connecter</button>
+    </div>
+  </div>
+
+  <!-- Panneau Admin -->
+  <div *ngIf="isAuthenticated" class="admin-panel">
+    <div class="admin-header">
+      <h1>🎨 Panneau d'Administration</h1>
+      <button (click)="logout()" class="btn-logout">Déconnexion</button>
+    </div>
+
+    <!-- Gestion du Header -->
+    <section class="admin-section">
+      <h2>📸 Images du Header (Carrousel)</h2>
+      <div class="header-images-list">
+        <div class="image-item" *ngFor="let img of headerImages; let i = index">
+          <img [src]="img" [alt]="'Header ' + i" />
+          <button (click)="removeHeaderImage(i)" class="btn-delete">
+            Supprimer
+          </button>
+        </div>
+      </div>
+
+      <div class="add-image-form">
+        <h3>📁 Ajouter une image au header (Fichier)</h3>
+        <div class="file-upload-area">
+          <input
+            type="file"
+            id="headerImageInput"
+            accept="image/*"
+            (change)="onHeaderImageSelected($event)"
+            hidden
+          />
+          <label for="headerImageInput" class="file-upload-label">
+            📤 Cliquez ou glissez une image
+          </label>
+          <div *ngIf="previewImage && newHeaderImageFile" class="preview">
+            <img [src]="previewImage" alt="Aperçu" />
+            <div class="preview-actions">
+              <button (click)="addHeaderImageFromFile()" class="btn-add">
+                ✅ Ajouter
+              </button>
+              <button (click)="cancelFileUpload()" class="btn-cancel">
+                ❌ Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="add-image-form">
+        <h3>🔗 Ou ajouter via URL</h3>
+        <input
+          type="text"
+          [(ngModel)]="newHeaderImage"
+          placeholder="URL de l'image du header"
+        />
+        <button (click)="addHeaderImage()" class="btn-add">
+          Ajouter au Header
+        </button>
+      </div>
+    </section>
+
+    <!-- Onglets Catégories -->
+    <section class="admin-section">
+      <div class="category-tabs">
+        <button
+          (click)="selectedCategory = 'photos'"
+          [ngClass]="{ active: selectedCategory === 'photos' }"
+        >
+          📷 Photos
+        </button>
+        <button
+          (click)="selectedCategory = 'evenements'"
+          [ngClass]="{ active: selectedCategory === 'evenements' }"
+        >
+          🎉 Événements
+        </button>
+      </div>
+
+      <!-- Ajouter une photo -->
+      <div class="add-photo-form">
+        <h3>📁 Ajouter une nouvelle photo (Fichier)</h3>
+        <div class="file-upload-area">
+          <input
+            type="file"
+            id="photoInput"
+            accept="image/*"
+            (change)="onPhotoSelected($event)"
+            hidden
+          />
+          <label for="photoInput" class="file-upload-label">
+            📤 Cliquez ou glissez une image
+          </label>
+          <div *ngIf="previewImage && newPhotoFile" class="preview">
+            <img [src]="previewImage" alt="Aperçu" />
+            <div class="preview-actions">
+              <button (click)="addPhotoFromFile()" class="btn-add">
+                ✅ Ajouter
+              </button>
+              <button (click)="cancelFileUpload()" class="btn-cancel">
+                ❌ Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+        <input
+          type="text"
+          [(ngModel)]="newPhoto.alt"
+          placeholder="Description de la photo"
+        />
+        <select [(ngModel)]="newPhoto.category">
+          <option value="photos">Photos</option>
+          <option value="evenements">Événements</option>
+        </select>
+      </div>
+
+      <div class="add-photo-form">
+        <h3>🔗 Ou ajouter via URL</h3>
+        <input
+          type="text"
+          [(ngModel)]="newPhoto.src"
+          placeholder="URL de la photo"
+        />
+        <input
+          type="text"
+          [(ngModel)]="newPhoto.alt"
+          placeholder="Description de la photo"
+        />
+        <select [(ngModel)]="newPhoto.category">
+          <option value="photos">Photos</option>
+          <option value="evenements">Événements</option>
+        </select>
+        <button (click)="addPhoto()" class="btn-add">Ajouter la photo</button>
+      </div>
+
+      <!-- Liste des photos -->
+      <div class="photos-list">
+        <h3>
+          {{ selectedCategory === "photos" ? "📷 Photos" : "🎉 Événements" }}
+        </h3>
+        <div class="photo-item" *ngFor="let photo of getPhotosByCategory()">
+          <img [src]="photo.src" [alt]="photo.alt" />
+          <div class="photo-info">
+            <label>Description:</label>
+            <input
+              type="text"
+              [value]="photo.alt"
+              (change)="updatePhoto(photo.id, 'alt', $any($event.target).value)"
+              placeholder="Description"
+            />
+            <label>URL de l'image:</label>
+            <input
+              type="text"
+              [value]="photo.src"
+              (change)="updatePhoto(photo.id, 'src', $any($event.target).value)"
+              placeholder="URL de l'image"
+            />
+          </div>
+          <button (click)="deletePhoto(photo.id)" class="btn-delete">
+            Supprimer
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
