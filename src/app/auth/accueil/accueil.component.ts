@@ -74,6 +74,11 @@ export class AccueilComponent implements OnInit {
 
   afficherSection(section: string) {
     this.sectionActive = section;
+
+    // Recharger les données quand on affiche photos/événements
+    if (section === 'photos' || section === 'evenements') {
+      this.loadData();
+    }
   }
 
   ouvrirLightbox(photo: Photo) {
