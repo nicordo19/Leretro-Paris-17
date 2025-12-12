@@ -1,9 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { AdminService, Photo } from '../services/admin.service';
+import { AuthService } from '../services/auth.service';
+import { Subscription } from 'rxjs';
+
+type PhotoForm = {
+  src: string;
+  alt: string;
+  category: Photo['category'];
+};
+
+const DEFAULT_PHOTO_CATEGORY: Photo['category'] = 'photos';
+const ADMIN_PANEL_IMPORTS = [CommonModule, FormsModule];
 
 /**
  * Composant d'administration pour la gestion des photos et du carousel
@@ -12,25 +23,26 @@ import { AdminService, Photo } from '../services/admin.service';
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: ADMIN_PANEL_IMPORTS,
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.css',
 })
-export class AdminPanelComponent implements OnInit {
+export class AdminPanelComponent implements OnInit, OnDestroy {
   // Données de photos et carousel
   photos: Photo[] = [];
   headerImages: string[] = [];
-  selectedCategory: 'header' | 'photos' | 'evenements' = 'photos';
+  selectedCategory: 'header' | 'photos' | 'evenements' = DEFAULT_PHOTO_CATEGORY;
 
   // État de l'authentification
   isAuthenticated = false;
+  email = '';
   password = '';
 
   // Données temporaires pour les nouveaux éléments
-  newPhoto: Partial<Photo> = {
+  newPhoto: PhotoForm = {
     src: '',
     alt: '',
-    category: 'photos',
+    category: DEFAULT_PHOTO_CATEGORY,
   };
   newHeaderImage = '';
 
@@ -44,57 +56,67 @@ export class AdminPanelComponent implements OnInit {
   errorMessage = '';
   isLoading = false;
 
-  constructor(private adminService: AdminService, private router: Router) {}
+  private authSubscription?: Subscription;
+
+  constructor(
+    private adminService: AdminService,
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.checkAuth();
-    if (this.isAuthenticated) {
-      this.loadData();
-    }
+    this.authSubscription = this.authService.user$.subscribe((user) => {
+      this.isAuthenticated = !!user;
+      if (this.isAuthenticated) {
+        this.loadData();
+      } else {
+        this.photos = [];
+        this.headerImages = [];
+      }
+    });
   }
 
-  /**
-   * Vérifie si l'utilisateur est authentifié via la session
-   */
-  checkAuth(): void {
-    const auth = sessionStorage.getItem(environment.storage.adminAuth);
-    if (auth === 'true') {
-      this.isAuthenticated = true;
-    }
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
   }
 
   /**
    * Authentifie l'utilisateur avec le mot de passe
    */
-  login(): void {
+  async login(): Promise<void> {
+    if (!this.email || !this.password) {
+      this.showError('Veuillez renseigner email et mot de passe');
+      return;
+    }
+
+    this.isLoading = true;
     try {
-      if (this.password === environment.admin.password) {
-        this.isAuthenticated = true;
-        sessionStorage.setItem(environment.storage.adminAuth, 'true');
-        this.password = '';
-        this.loadData();
-        this.showSuccess('Connecté avec succès');
-      } else {
-        this.showError('Mot de passe incorrect');
-        this.password = '';
-      }
+      await this.authService.login(this.email, this.password);
+      this.email = '';
+      this.password = '';
+      this.showSuccess('Connecté avec succès');
     } catch (error) {
       console.error('Erreur lors de la connexion', error);
-      this.showError('Erreur lors de la connexion');
+      this.showError('Email ou mot de passe incorrect');
+    } finally {
+      this.isLoading = false;
     }
   }
 
   /**
    * Déconnecte l'utilisateur
    */
-  logout(): void {
+  async logout(): Promise<void> {
+    this.isLoading = true;
     try {
-      this.isAuthenticated = false;
-      sessionStorage.removeItem(environment.storage.adminAuth);
+      await this.authService.logout();
       this.router.navigate(['/']);
+      this.showSuccess('Déconnecté');
     } catch (error) {
       console.error('Erreur lors de la déconnexion', error);
       this.showError('Erreur lors de la déconnexion');
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -131,7 +153,7 @@ export class AdminPanelComponent implements OnInit {
   /**
    * Ajoute une nouvelle photo
    */
-  addPhoto(): void {
+  async addPhoto(): Promise<void> {
     try {
       if (!this.newPhoto.src || !this.newPhoto.alt || !this.newPhoto.category) {
         this.showError('Veuillez remplir tous les champs');
@@ -139,7 +161,7 @@ export class AdminPanelComponent implements OnInit {
       }
 
       this.isLoading = true;
-      this.adminService.addPhoto(this.newPhoto as Photo);
+      await this.adminService.addPhoto(this.newPhoto as Photo);
       this.newPhoto = { src: '', alt: '', category: this.selectedCategory };
       this.showSuccess('Photo ajoutée avec succès');
       this.loadData();
@@ -155,11 +177,11 @@ export class AdminPanelComponent implements OnInit {
    * Supprime une photo après confirmation
    * @param id - ID de la photo à supprimer
    */
-  deletePhoto(id: string): void {
+  async deletePhoto(id: string): Promise<void> {
     try {
       if (confirm('Êtes-vous sûr de vouloir supprimer cette photo ?')) {
         this.isLoading = true;
-        this.adminService.deletePhoto(id);
+        await this.adminService.deletePhoto(id);
         this.showSuccess('Photo supprimée avec succès');
         this.loadData();
       }
@@ -177,9 +199,11 @@ export class AdminPanelComponent implements OnInit {
    * @param field - Propriété à mettre à jour
    * @param value - Nouvelle valeur
    */
-  updatePhoto(id: string, field: string, value: any): void {
+  async updatePhoto(id: string, field: string, value: any): Promise<void> {
     try {
-      this.adminService.updatePhoto(id, { [field]: value } as Partial<Photo>);
+      await this.adminService.updatePhoto(id, {
+        [field]: value,
+      } as Partial<Photo>);
       this.showSuccess('Photo mise à jour');
     } catch (error) {
       console.error('Erreur lors de la mise à jour de la photo', error);
@@ -190,7 +214,7 @@ export class AdminPanelComponent implements OnInit {
   /**
    * Ajoute une nouvelle image au carousel
    */
-  addHeaderImage(): void {
+  async addHeaderImage(): Promise<void> {
     try {
       if (!this.newHeaderImage) {
         this.showError('Veuillez entrer une URL');
@@ -203,7 +227,7 @@ export class AdminPanelComponent implements OnInit {
       }
 
       const updated = [...this.headerImages, this.newHeaderImage];
-      this.adminService.updateHeaderImages(updated);
+      await this.adminService.updateHeaderImages(updated);
       this.newHeaderImage = '';
       this.showSuccess('Image ajoutée au carousel');
       this.loadData();
@@ -217,10 +241,10 @@ export class AdminPanelComponent implements OnInit {
    * Supprime une image du carousel
    * @param index - Index de l'image à supprimer
    */
-  removeHeaderImage(index: number): void {
+  async removeHeaderImage(index: number): Promise<void> {
     try {
       const updated = this.headerImages.filter((_, i) => i !== index);
-      this.adminService.updateHeaderImages(updated);
+      await this.adminService.updateHeaderImages(updated);
       this.showSuccess('Image supprimée du carousel');
       this.loadData();
     } catch (error) {
@@ -297,7 +321,7 @@ export class AdminPanelComponent implements OnInit {
   /**
    * Ajoute une image au carousel depuis un fichier uploadé
    */
-  addHeaderImageFromFile(): void {
+  async addHeaderImageFromFile(): Promise<void> {
     try {
       if (!this.newHeaderImageFile) {
         this.showError('Veuillez sélectionner un fichier');
@@ -307,12 +331,12 @@ export class AdminPanelComponent implements OnInit {
       this.isLoading = true;
       const reader = new FileReader();
 
-      reader.onload = (e: ProgressEvent<FileReader>) => {
+      reader.onload = async (e: ProgressEvent<FileReader>) => {
         try {
           if (e.target && typeof e.target.result === 'string') {
             const base64Image = e.target.result;
             const updated = [...this.headerImages, base64Image];
-            this.adminService.updateHeaderImages(updated);
+            await this.adminService.updateHeaderImages(updated);
             this.clearFileUpload();
             this.showSuccess('Image ajoutée au carousel');
             this.loadData();
@@ -341,61 +365,38 @@ export class AdminPanelComponent implements OnInit {
   /**
    * Ajoute une photo depuis un fichier uploadé
    */
-  addPhotoFromFile(): void {
+  async addPhotoFromFile(): Promise<void> {
+    if (!this.newPhotoFile) {
+      this.showError('Veuillez sélectionner un fichier');
+      return;
+    }
+
+    if (!this.newPhoto.alt || !this.newPhoto.category) {
+      this.showError('Veuillez remplir la description et la catégorie');
+      return;
+    }
+
+    this.isLoading = true;
     try {
-      if (!this.newPhotoFile) {
-        this.showError('Veuillez sélectionner un fichier');
-        return;
-      }
-
-      if (!this.newPhoto.alt || !this.newPhoto.category) {
-        this.showError('Veuillez remplir la description et la catégorie');
-        return;
-      }
-
-      this.isLoading = true;
-      const reader = new FileReader();
-
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        try {
-          if (e.target && typeof e.target.result === 'string') {
-            const base64Image = e.target.result;
-            const photo: Photo = {
-              id: Date.now().toString(),
-              src: base64Image,
-              alt: this.newPhoto.alt || '',
-              category: this.newPhoto.category as
-                | 'header'
-                | 'photos'
-                | 'evenements',
-            };
-            this.adminService.addPhoto(photo);
-            this.clearFileUpload();
-            this.newPhoto = {
-              src: '',
-              alt: '',
-              category: this.selectedCategory,
-            };
-            this.showSuccess('Photo ajoutée avec succès');
-            this.loadData();
-          }
-        } catch (error) {
-          console.error("Erreur lors de l'encodage du fichier", error);
-          this.showError('Erreur lors du traitement du fichier');
-        } finally {
-          this.isLoading = false;
-        }
+      await this.adminService.addPhotoFromFile(
+        this.newPhotoFile,
+        this.newPhoto.alt,
+        this.newPhoto.category
+      );
+      this.clearFileUpload();
+      this.newPhoto = {
+        src: '',
+        alt: '',
+        category: this.selectedCategory,
       };
-
-      reader.onerror = () => {
-        this.showError('Erreur lors de la lecture du fichier');
-        this.isLoading = false;
-      };
-
-      reader.readAsDataURL(this.newPhotoFile);
+      this.showSuccess('Photo ajoutée avec succès');
+      this.loadData();
     } catch (error) {
       console.error("Erreur lors de l'upload de la photo", error);
-      this.showError("Erreur lors de l'upload");
+      this.showError(
+        (error as Error).message || "Erreur lors de l'upload de la photo"
+      );
+    } finally {
       this.isLoading = false;
     }
   }

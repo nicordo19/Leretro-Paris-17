@@ -12,6 +12,12 @@
     <h1>🔐 Accès Admin</h1>
     <div class="login-form">
       <input
+        type="email"
+        [(ngModel)]="email"
+        placeholder="Entrer l'email"
+        (keyup.enter)="login()"
+      />
+      <input
         type="password"
         [(ngModel)]="password"
         placeholder="Entrer le mot de passe"

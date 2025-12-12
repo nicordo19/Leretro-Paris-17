@@ -40,3 +40,7 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Local runtime secrets
+src/assets/env.js
+firebase-debug.log
