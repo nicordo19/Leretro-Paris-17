@@ -37,6 +37,11 @@ const defaultConfig: FirebaseConfig = {
 const runtimeConfig =
   (typeof window !== 'undefined' && window.__env?.firebase) || {};
 
+export const hasFirebaseConfig =
+  !!runtimeConfig.apiKey &&
+  runtimeConfig.apiKey !== '' &&
+  runtimeConfig.apiKey !== 'VOTRE_FIREBASE_API_KEY';
+
 export const firebaseConfig: FirebaseConfig = {
   ...defaultConfig,
   ...runtimeConfig,

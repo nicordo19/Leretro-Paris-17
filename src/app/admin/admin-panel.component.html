@@ -7,28 +7,8 @@
     ❌ {{ errorMessage }}
   </div>
 
-  <!-- Authentification -->
-  <div *ngIf="!isAuthenticated" class="login-section">
-    <h1>🔐 Accès Admin</h1>
-    <div class="login-form">
-      <input
-        type="email"
-        [(ngModel)]="email"
-        placeholder="Entrer l'email"
-        (keyup.enter)="login()"
-      />
-      <input
-        type="password"
-        [(ngModel)]="password"
-        placeholder="Entrer le mot de passe"
-        (keyup.enter)="login()"
-      />
-      <button (click)="login()" class="btn-login">Se connecter</button>
-    </div>
-  </div>
-
   <!-- Panneau Admin -->
-  <div *ngIf="isAuthenticated" class="admin-panel">
+  <div class="admin-panel">
     <div class="admin-header">
       <h1>🎨 Panneau d'Administration</h1>
       <button (click)="logout()" class="btn-logout">Déconnexion</button>

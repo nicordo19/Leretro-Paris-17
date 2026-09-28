@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/login
+Crawl-delay: 1
+
+Sitemap: https://leretro-paris.fr/sitemap.xml
+
+User-agent: AdsBot-Google
+Disallow:
+
+User-agent: Bingbot
+Disallow: /admin
+Allow: /

@@ -1,171 +1,156 @@
-<div class="vitrine">
-  <!-- Image de couverture -->
-  <header class="header-accueil">
+<div class="vitrine" [class.menu-ouvert]="menuOpen">
+  <nav class="navigation" aria-label="Navigation principale">
+    <a class="marque" href="#accueil" (click)="menuOpen = false">
+      <span class="logo-typographique"><strong>Le Rétro</strong><small>Bistrot parisien</small></span>
+    </a>
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-label="Ouvrir le menu"
+      [attr.aria-expanded]="menuOpen"
+      (click)="toggleMenu()"
+    >
+      <span></span><span></span><span></span>
+    </button>
+    <div class="navigation-liens" [class.navigation-liens-visible]="menuOpen">
+      <button type="button" (click)="afficherSection('photos')">Photos</button>
+      <button type="button" (click)="afficherSection('menu')">La carte</button>
+      <button type="button" (click)="afficherSection('evenements')">Événements</button>
+      <button type="button" (click)="afficherSection('reservation')">Contact</button>
+      <button class="bouton-reserver" type="button" (click)="afficherSection('reservation')">
+        Réserver
+      </button>
+    </div>
+  </nav>
+
+  <header class="header-accueil" id="accueil">
     <img
       class="image-couvertur carousel-img"
       appCarouselCover
       [carouselImages]="headerImages"
       alt="Photos du restaurant Le Rétro"
     />
-  </header>
-  <!-- À propos -->
-  <section class="section" id="a-propos">
-    <h2>LE RETRO</h2>
-    <p>
-      Le Rétro est un bistrot parisien niché au cœur du 17ᵉ arrondissement. Il
-      propose une cuisine faite maison dans une ambiance vintage, chaleureuse et
-      conviviale.
-    </p>
-  </section>
-
-  <!-- Boutons de navigation -->
-  <div class="boutons-navigation">
-    <button (click)="afficherSection('photos')">📸 Voir les photos</button>
-    <button (click)="afficherSection('menu')">🍽️ Voir le menu</button>
-    <button (click)="afficherSection('evenements')">🎉 Événements</button>
-    <button (click)="afficherSection('reservation')">
-      📞 Réserver une table
-    </button>
-  </div>
-
-  <!-- Sections conditionnelles -->
-  <div class="section-contenu">
-    <!-- Photos -->
-    <ng-container *ngIf="sectionActive === 'photos'">
-      <h2>Photos du restaurant</h2>
-      <div class="galerie-photos">
-        <figure
-          class="galerie-item"
-          *ngFor="let photo of photos"
-          (click)="ouvrirLightbox(photo)"
-        >
-          <img [src]="photo.src" [alt]="photo.alt" />
-        </figure>
+    <div class="hero-voile"></div>
+    <div class="hero-contenu">
+      <p class="sur-titre">Paris 17e · Depuis toujours</p>
+      <h1>Le Rétro</h1>
+      <p class="hero-description">
+        Un bistrot parisien chaleureux au cœur de la rue de Tocqueville.
+      </p>
+      <div class="hero-actions">
+        <button class="bouton-principal" type="button" (click)="afficherSection('reservation')">
+          Réserver une table
+        </button>
+        <button class="bouton-secondaire" type="button" (click)="afficherSection('menu')">
+          Découvrir la carte
+        </button>
       </div>
-      <div class="lightbox" *ngIf="lightboxActive" (click)="fermerLightbox()">
-        <div class="lightbox-content">
-          <button
-            class="lightbox-close"
-            aria-label="Fermer la photo agrandie"
-            (click)="fermerLightbox($event)"
-          >
-            ×
-          </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="section intro-section" id="a-propos">
+      <p class="eyebrow">L'esprit du Rétro</p>
+      <h2>Un coin de quartier où l'on aime revenir</h2>
+      <p class="intro-copy">
+        Le Rétro est un bistrot parisien niché au cœur du 17ᵉ arrondissement. Il
+        propose une cuisine faite maison dans une ambiance vintage, chaleureuse et
+        conviviale. Situé au 2 Rue de Tocqueville à Paris, Le Rétro vous accueille
+        du lundi au samedi de 9h à 1h du matin, et le dimanche de 15h à 22h.
+      </p>
+      <div class="ligne-accent" aria-hidden="true"></div>
+    </section>
+
+    <section class="raccourcis" aria-label="Découvrir Le Rétro">
+      <button type="button" (click)="afficherSection('photos')"><span>01</span><strong>Voir les photos</strong></button>
+      <button type="button" (click)="afficherSection('menu')"><span>02</span><strong>Découvrir la carte</strong></button>
+      <button type="button" (click)="afficherSection('evenements')"><span>03</span><strong>Nos événements</strong></button>
+    </section>
+
+    <div class="section-contenu">
+      <ng-container *ngIf="sectionActive === 'photos'">
+        <section class="section contenu-section" id="photos" aria-labelledby="photos-title">
+          <p class="eyebrow">L'ambiance du Rétro</p>
+          <h2 id="photos-title">Photos du restaurant</h2>
+          <div class="galerie-photos">
+            <figure class="galerie-item" *ngFor="let photo of photos">
+              <button type="button" (click)="ouvrirLightbox(photo)" [attr.aria-label]="'Agrandir : ' + photo.alt">
+                <img [src]="photo.src" [alt]="photo.alt" loading="lazy" />
+              </button>
+            </figure>
+          </div>
+        </section>
+      </ng-container>
+
+      <ng-container *ngIf="sectionActive === 'menu'">
+        <section class="section contenu-section" id="menu" aria-labelledby="menu-title">
+          <p class="eyebrow">À table</p>
+          <h2 id="menu-title">Nos cartes</h2>
+          <div class="menus-grid">
+            <article class="menu-container" *ngFor="let menu of menus">
+              <button type="button" (click)="ouvrirLightboxMenu(menu)" [attr.aria-label]="'Agrandir : ' + menu.title">
+                <span class="menu-index">Carte</span>
+                <h3>{{ menu.title }}</h3>
+                <img [src]="menu.src" [alt]="menu.alt" class="menu-image" loading="lazy" />
+                <span class="zoom-label">Agrandir la carte</span>
+              </button>
+            </article>
+          </div>
+        </section>
+      </ng-container>
+
+      <ng-container *ngIf="sectionActive === 'evenements'">
+        <section class="section contenu-section" id="evenements" aria-labelledby="evenements-title">
+          <p class="eyebrow">Au Rétro</p>
+          <h2 id="evenements-title">Événements</h2>
+          <p class="section-intro">Afterworks, privatisations, soirées ? : Contactez-Nous.</p>
+          <div class="galerie-photos">
+            <figure class="galerie-item" *ngFor="let photo of photosEvenements">
+              <button type="button" (click)="ouvrirLightbox(photo)" [attr.aria-label]="'Agrandir : ' + photo.alt">
+                <img [src]="photo.src" [alt]="photo.alt" loading="lazy" />
+              </button>
+            </figure>
+          </div>
+        </section>
+      </ng-container>
+
+      <div class="lightbox" *ngIf="lightboxActive" (click)="fermerLightbox()" role="dialog" aria-modal="true" aria-label="Image agrandie">
+        <div class="lightbox-content" (click)="$event.stopPropagation()">
+          <button class="lightbox-close" type="button" aria-label="Fermer la photo agrandie" (click)="fermerLightbox($event)">×</button>
           <img [src]="lightboxImage" [alt]="lightboxAlt" />
         </div>
       </div>
-    </ng-container>
 
-    <!-- Menu -->
-    <ng-container *ngIf="sectionActive === 'menu'">
-      <section class="section" id="carte">
-        <h2>Nos Cartes</h2>
-        <div class="menus-grid">
-          <div
-            class="menu-container menu-du-jour"
-            *ngFor="let menu of menus"
-            (click)="ouvrirLightboxMenu(menu)"
-            style="cursor: pointer"
-          >
-            <h3>{{ menu.title }}</h3>
-            <img [src]="menu.src" [alt]="menu.alt" class="menu-image" />
-            <p style="font-size: 12px; color: #888; margin-top: 10px">
-              🔍 Cliquez pour agrandir
-            </p>
+      <ng-container *ngIf="sectionActive === 'reservation'">
+        <section class="section reservation-section" id="reservation" aria-labelledby="reservation-title">
+          <div class="reservation-heading">
+            <p class="eyebrow">Votre table vous attend</p>
+            <h2 id="reservation-title">Réserver au Rétro</h2>
+            <p>Choisissez votre créneau directement avec TheFork, ou contactez-nous par téléphone.</p>
           </div>
-        </div>
-        <div class="lightbox" *ngIf="lightboxActive" (click)="fermerLightbox()">
-          <div class="lightbox-content">
-            <button
-              class="lightbox-close"
-              aria-label="Fermer la photo agrandie"
-              (click)="fermerLightbox($event)"
-            >
-              ×
-            </button>
-            <img [src]="lightboxImage" [alt]="lightboxAlt" />
+          <div class="reservation-layout">
+            <div class="reservation-details">
+              <div class="detail-item"><span class="detail-icon">⌖</span><div><strong>Adresse</strong><p>2 Rue de Tocqueville<br />75017 Paris</p></div></div>
+              <div class="detail-item"><span class="detail-icon">◷</span><div><strong>Horaires</strong><button type="button" class="hours-button" (click)="toggleHours()">{{ showHours ? 'Masquer les horaires' : 'Afficher les horaires' }}</button><div *ngIf="showHours" class="horaires"><p>Lundi au Samedi : 09:00 – 01:00</p><p>Dimanche : 15:00 – 22:00</p></div></div></div>
+              <div class="detail-item"><span class="detail-icon">☎</span><div><strong>Par téléphone</strong><a href="tel:0140189002">01 40 18 90 02</a></div></div>
+            </div>
+            <div class="thefork-panel">
+              <iframe src="https://widget.thefork.com/cb5cfd2d-88a4-438f-8cd9-6d5b551c63cd" title="Réserver une table au Rétro avec TheFork" allow="payment *"></iframe>
+              <a class="fallback-link" [href]="theForkUrl" target="_blank" rel="noopener noreferrer">Ouvrir la réservation sur TheFork</a>
+            </div>
           </div>
-        </div>
-      </section>
-    </ng-container>
+        </section>
+      </ng-container>
+    </div>
+  </main>
 
-    <!-- Événements -->
-    <ng-container *ngIf="sectionActive === 'evenements'">
-      <section class="section">
-        <h2>Événements</h2>
-        <p>Afterworks, privatisations, soirées ? : Contactez-Nous.</p>
-        <div class="galerie-photos">
-          <figure
-            class="galerie-item"
-            *ngFor="let photo of photosEvenements"
-            (click)="ouvrirLightbox(photo)"
-          >
-            <img [src]="photo.src" [alt]="photo.alt" />
-          </figure>
-        </div>
-        <div class="lightbox" *ngIf="lightboxActive" (click)="fermerLightbox()">
-          <div class="lightbox-content">
-            <button
-              class="lightbox-close"
-              aria-label="Fermer la photo agrandie"
-              (click)="fermerLightbox($event)"
-            >
-              ×
-            </button>
-            <img [src]="lightboxImage" [alt]="lightboxAlt" />
-          </div>
-        </div>
-      </section>
-    </ng-container>
-
-    <!-- Réservation -->
-    <ng-container *ngIf="sectionActive === 'reservation'">
-      <section class="section" id="contact">
-        <h2>Réserver une table</h2>
-        <p>📍 <strong>Adresse :</strong> 2 Rue de Tocqueville, 75017 Paris</p>
-        <p>
-          📞 <strong>Téléphone :</strong>
-          <a href="tel:0140189002">01 40 18 90 02</a>
-        </p>
-
-        <button (click)="toggleHours()" class="btn">
-          Afficher les horaires
-        </button>
-
-        <div *ngIf="showHours" class="horaires">
-          <p><strong>Lundi au Samedi :</strong> 09:00 – 01:00</p>
-          <p><strong>Dimanche :</strong> 15:00 – 22:00</p>
-        </div>
-      </section>
-    </ng-container>
-  </div>
-
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-container">
-      <div class="footer-col">
-        <h3>📍 Adresse</h3>
-        <p>2 Rue de Tocqueville<br />75017 Paris</p>
-      </div>
-      <div class="footer-col">
-        <h3>🕒 Horaires</h3>
-        <p>Lundi – Samedi : 09h00 – 01h00<br />Dimanche : 15h00 – 22h00</p>
-      </div>
-      <div class="footer-col">
-        <h3>📞 Contact</h3>
-        <p><a href="tel:0140189002">01 40 18 90 02</a><br /></p>
-      </div>
-      <div class="footer-col">
-        <h3>🔗 Suivez-nous</h3>
-        <p>
-          <a href="#"><i class="fab fa-instagram"></i> Instagram</a><br />
-          <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
-        </p>
-      </div>
+      <div class="footer-brand"><span class="logo-typographique"><strong>Le Rétro</strong><small>Bistrot parisien</small></span><p>Un bistrot parisien au cœur du 17ᵉ.</p></div>
+      <div class="footer-col"><h3>Venir</h3><p>2 Rue de Tocqueville<br />75017 Paris</p><a href="https://maps.google.com/?q=2+Rue+de+Tocqueville+75017+Paris" target="_blank" rel="noopener noreferrer">Voir l'itinéraire</a></div>
+      <div class="footer-col"><h3>Nous joindre</h3><a href="tel:0140189002">01 40 18 90 02</a><a href="https://www.instagram.com/le_retro_paris?igsh=dm93YTk5NjR4c3Rk" target="_blank" rel="noopener noreferrer">Instagram</a></div>
+      <div class="footer-col"><h3>Réserver</h3><button type="button" (click)="afficherSection('reservation')">Réserver une table</button></div>
     </div>
-
-    <div class="footer-bottom">
-      <p>&copy; 2025 Le Rétro Paris — Tous droits réservés</p>
-    </div>
+    <div class="footer-bottom"><span>© 2025 Le Rétro Paris — Tous droits réservés</span><a href="/admin/login">Accès administration</a></div>
   </footer>
 </div>

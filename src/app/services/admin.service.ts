@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { StorageService } from './storage.service';
 import { FirebaseService } from './firebase.service';
+import { StorageService } from './storage.service';
 
 /**
  * Interface représentant une photo avec ses métadonnées
@@ -81,7 +80,10 @@ export class AdminService {
         }
       },
       error: (error) => {
-        console.error('Erreur Firebase (photos), utilisation du cache local', error);
+        console.error(
+          'Erreur Firebase (photos), utilisation du cache local',
+          error
+        );
       },
     });
 
@@ -95,7 +97,10 @@ export class AdminService {
         }
       },
       error: (error) => {
-        console.error('Erreur Firebase (header), utilisation du cache local', error);
+        console.error(
+          'Erreur Firebase (header), utilisation du cache local',
+          error
+        );
       },
     });
   }
@@ -128,19 +133,84 @@ export class AdminService {
 
   private getDefaultPhotos(): Photo[] {
     return [
-      { id: '1', src: 'assets/imageretro/Photo/Retro-server2.jpg', alt: 'Serveur', category: 'photos' },
-      { id: '2', src: 'assets/imageretro/Photo/Retro-server.jpg', alt: 'Serveur 2', category: 'photos' },
-      { id: '3', src: 'assets/imageretro/Photo/Retro-bar.jpg', alt: 'Bar rétro', category: 'photos' },
-      { id: '4', src: 'assets/imageretro/Photo/Retro-face.jpg', alt: 'Façade du bistrot', category: 'photos' },
-      { id: '5', src: 'assets/imageretro/Photo/plat2.jpeg', alt: 'Bar et cocktails', category: 'photos' },
-      { id: '6', src: 'assets/imageretro/Photo/Retro-plat.jpg', alt: 'Plat signature', category: 'photos' },
-      { id: '7', src: 'assets/imageretro/Photo/photo9.webp', alt: 'Salle du restaurant', category: 'photos' },
-      { id: '8', src: 'assets/imageretro/Photo/plat3.jpeg', alt: "Vue d'ensemble", category: 'photos' },
-      { id: '9', src: 'assets/imageretro/Photo/photo5.webp', alt: 'Dessert maison', category: 'photos' },
-      { id: '10', src: 'assets/imageretro/Photo/cocktail.jpeg', alt: 'Dessert maison', category: 'photos' },
-      { id: '11', src: 'assets/imageretro/Photo/chef.jpeg', alt: 'Ambiance vintage', category: 'photos' },
-      { id: 'e1', src: 'assets/imageretro/evenement/evenement.jpeg', alt: 'Serveur', category: 'evenements' },
-      { id: 'e2', src: 'assets/imageretro/evenement/evenement2.jpeg', alt: 'Serveur 2', category: 'evenements' },
+      {
+        id: '1',
+        src: 'assets/imageretro/Photo/Retro-server2.jpg',
+        alt: 'Serveur',
+        category: 'photos',
+      },
+      {
+        id: '2',
+        src: 'assets/imageretro/Photo/Retro-server.jpg',
+        alt: 'Serveur 2',
+        category: 'photos',
+      },
+      {
+        id: '3',
+        src: 'assets/imageretro/Photo/Retro-bar.jpg',
+        alt: 'Bar rétro',
+        category: 'photos',
+      },
+      {
+        id: '4',
+        src: 'assets/imageretro/Photo/Retro-face.jpg',
+        alt: 'Façade du bistrot',
+        category: 'photos',
+      },
+      {
+        id: '5',
+        src: 'assets/imageretro/Photo/plat2.jpeg',
+        alt: 'Bar et cocktails',
+        category: 'photos',
+      },
+      {
+        id: '6',
+        src: 'assets/imageretro/Photo/Retro-plat.jpg',
+        alt: 'Plat signature',
+        category: 'photos',
+      },
+      {
+        id: '7',
+        src: 'assets/imageretro/Photo/photo9.webp',
+        alt: 'Salle du restaurant',
+        category: 'photos',
+      },
+      {
+        id: '8',
+        src: 'assets/imageretro/Photo/plat3.jpeg',
+        alt: "Vue d'ensemble",
+        category: 'photos',
+      },
+      {
+        id: '9',
+        src: 'assets/imageretro/Photo/photo5.webp',
+        alt: 'Dessert maison',
+        category: 'photos',
+      },
+      {
+        id: '10',
+        src: 'assets/imageretro/Photo/cocktail.jpeg',
+        alt: 'Dessert maison',
+        category: 'photos',
+      },
+      {
+        id: '11',
+        src: 'assets/imageretro/Photo/chef.jpeg',
+        alt: 'Ambiance vintage',
+        category: 'photos',
+      },
+      {
+        id: 'e1',
+        src: 'assets/imageretro/evenement/evenement.jpeg',
+        alt: 'Serveur',
+        category: 'evenements',
+      },
+      {
+        id: 'e2',
+        src: 'assets/imageretro/evenement/evenement2.jpeg',
+        alt: 'Serveur 2',
+        category: 'evenements',
+      },
     ];
   }
 
@@ -191,13 +261,13 @@ export class AdminService {
         this.addPhotoLocal(photoWithId);
       }
     } catch (error) {
-      console.error('Erreur lors de l\'ajout de la photo', error);
-      throw new Error('Impossible d\'ajouter la photo');
+      console.error("Erreur lors de l'ajout de la photo", error);
+      throw new Error("Impossible d'ajouter la photo");
     }
   }
 
   /**
-   * Ajoute une photo à partir d'un fichier en utilisant Firebase Storage
+   * Ajoute une photo à partir d'un fichier en convertissant en base64
    */
   async addPhotoFromFile(
     file: File,
@@ -206,13 +276,8 @@ export class AdminService {
   ): Promise<void> {
     try {
       const photoId = Date.now().toString();
-      let photoSrc: string;
-
-      if (this.firebaseService.isReady()) {
-        photoSrc = await this.firebaseService.uploadPhotoFile(file, photoId);
-      } else {
-        photoSrc = await this.convertFileToBase64(file);
-      }
+      // Convertir directement en base64 au lieu d'uploader à Storage
+      const photoSrc = await this.convertFileToBase64(file);
 
       await this.addPhoto({
         id: photoId,
@@ -221,8 +286,11 @@ export class AdminService {
         category,
       });
     } catch (error) {
-      console.error('Erreur lors de l\'ajout de la photo depuis un fichier', error);
-      throw new Error('Impossible d\'ajouter la photo depuis ce fichier');
+      console.error(
+        "Erreur lors de l'ajout de la photo depuis un fichier",
+        error
+      );
+      throw new Error("Impossible d'ajouter la photo depuis ce fichier");
     }
   }
 
@@ -344,33 +412,30 @@ export class AdminService {
    * Alimente Firebase avec les photos par défaut si la base est vide
    */
   private seedDefaultPhotosToFirebase(): void {
-    if (this.hasSeededPhotos) {
+    if (this.hasSeededPhotos || !this.firebaseService.isReady()) {
       return;
     }
     this.hasSeededPhotos = true;
     const defaults = this.getDefaultPhotos();
-    this.firebaseService
-      .replacePhotos(defaults)
-      .catch((error) => {
-        console.error('Impossible de synchroniser les photos par défaut', error);
-        this.hasSeededPhotos = false;
-      });
+    this.firebaseService.replacePhotos(defaults).catch((error) => {
+      console.error('Impossible de synchroniser les photos par défaut', error);
+      this.hasSeededPhotos = false;
+    });
   }
 
   /**
    * Alimente Firebase avec les images header par défaut si nécessaire
    */
   private seedDefaultHeaderToFirebase(): void {
-    if (this.hasSeededHeader) {
+    if (this.hasSeededHeader || !this.firebaseService.isReady()) {
       return;
     }
     this.hasSeededHeader = true;
     const defaults = this.getDefaultHeaderImages();
-    this.firebaseService
-      .updateHeaderImages(defaults)
-      .catch((error) => {
-        console.error('Impossible de synchroniser le header par défaut', error);
-        this.hasSeededHeader = false;
-      });
+    this.firebaseService.updateHeaderImages(defaults).catch((error) => {
+      console.error('Impossible de synchroniser le header par défaut', error);
+      this.hasSeededHeader = false;
+    });
   }
+
 }

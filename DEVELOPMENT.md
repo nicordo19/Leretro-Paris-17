@@ -256,7 +256,6 @@ ngOnInit() {
 
 - Persistance des photos (Base64 encoded)
 - Images du carousel
-- État d'authentification
 
 **Avantages**:
 
@@ -278,7 +277,6 @@ Définies dans `environment.ts`:
 storage: {
   photos: 'retro_photos',
   headerImages: 'retro_header',
-  adminAuth: 'admin_authenticated',
 }
 ```
 
@@ -303,12 +301,6 @@ storage: {
 ["data:image/jpeg;base64,...", "assets/imageretro/header/image.jpg"]
 ```
 
-**Authentification**:
-
-```
-admin_authenticated = "true" | "false"
-```
-
 ---
 
 ## Configuration d'Environnement
@@ -321,14 +313,9 @@ admin_authenticated = "true" | "false"
 export const environment = {
   production: false,
 
-  admin: {
-    password: "LeRetro2025",
-  },
-
   storage: {
     photos: "retro_photos",
     headerImages: "retro_header",
-    adminAuth: "admin_authenticated",
   },
 
   api: {
@@ -353,9 +340,6 @@ export const environment = {
 
 ```typescript
 import { environment } from "../../environments/environment";
-
-// Accès au mot de passe
-const password = environment.admin.password;
 
 // Accès aux clés de stockage
 const key = environment.storage.photos;

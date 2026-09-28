@@ -46,54 +46,6 @@
   }
 }
 
-.login-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #6d4b03 0%, #8b6914 100%);
-  color: white;
-}
-
-.login-section h1 {
-  font-size: 48px;
-  margin-bottom: 30px;
-  letter-spacing: 2px;
-}
-
-.login-form {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.login-form input {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  width: 300px;
-  font-family: "Lato", sans-serif;
-}
-
-.btn-login {
-  padding: 12px 30px;
-  background: #f4c430;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s;
-  font-size: 16px;
-}
-
-.btn-login:hover {
-  background: #e6b800;
-}
-
 .admin-header {
   display: flex;
   justify-content: space-between;

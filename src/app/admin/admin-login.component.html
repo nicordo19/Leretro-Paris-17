@@ -1,0 +1,32 @@
+<div class="login-section">
+  <div class="login-card">
+    <h1>🔐 Accès Back-Office</h1>
+    <p>
+      Connectez-vous avec votre compte Firebase autorisé pour gérer le contenu.
+    </p>
+
+    <div *ngIf="errorMessage" class="error-message">
+      ❌ {{ errorMessage }}
+    </div>
+
+    <div class="login-form">
+      <input
+        type="email"
+        [(ngModel)]="email"
+        placeholder="Email"
+        (keyup.enter)="login()"
+      />
+      <input
+        type="password"
+        [(ngModel)]="password"
+        placeholder="Mot de passe"
+        (keyup.enter)="login()"
+      />
+      <button (click)="login()" class="btn-login" [disabled]="isLoading">
+        {{ isLoading ? 'Connexion...' : 'Se connecter' }}
+      </button>
+    </div>
+
+    <p class="login-hint">Accès réservé à l'équipe Le Retro.</p>
+  </div>
+</div>

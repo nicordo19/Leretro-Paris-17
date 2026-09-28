@@ -5,16 +5,10 @@
 export const environment = {
   production: true,
 
-  // Admin Configuration
-  admin: {
-    password: 'LeRetro2025', // Change this!
-  },
-
   // Storage Keys
   storage: {
     photos: 'retro_photos',
     headerImages: 'retro_header',
-    adminAuth: 'admin_authenticated',
   },
 
   // API Configuration (for future use)

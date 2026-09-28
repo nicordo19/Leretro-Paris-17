@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Optional } from '@angular/core';
 import {
   Database,
-  onValue,
   ref as dbRef,
+  onValue,
   remove,
   set,
   update,
@@ -10,8 +10,8 @@ import {
 import {
   deleteObject,
   getDownloadURL,
-  ref as storageRef,
   Storage,
+  ref as storageRef,
   uploadBytes,
 } from '@angular/fire/storage';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -32,11 +32,24 @@ export class FirebaseService {
   public headerImages$ = this.headerImagesSubject.asObservable();
 
   private isInitialized = false;
+  private firebaseDisabled = false;
 
-  constructor(private db: Database, private storage: Storage) {
+  constructor(
+    @Optional() private db: Database | null,
+    @Optional() private storage: Storage | null
+  ) {
     // Charger immédiatement les données locales pour éviter un écran vide
     this.loadPhotosFromLocalStorage();
     this.loadHeaderImagesFromLocalStorage();
+
+    if (!this.db || !this.storage) {
+      this.firebaseDisabled = true;
+      console.warn(
+        'Firebase non configuré. Utilisation du mode local (localStorage).'
+      );
+      return;
+    }
+
     this.initializeRealtimeListeners();
   }
 
@@ -44,6 +57,9 @@ export class FirebaseService {
    * Initialise les listeners temps réel Firebase
    */
   private initializeRealtimeListeners(): void {
+    if (this.firebaseDisabled || !this.db) {
+      return;
+    }
     try {
       this.listenToPhotos();
       this.listenToHeaderImages();
@@ -56,13 +72,16 @@ export class FirebaseService {
    * Ecoute les changements sur les photos en temps réel
    */
   private listenToPhotos(): void {
+    if (!this.db) {
+      return;
+    }
     const photosRef = dbRef(this.db, 'photos');
     onValue(
       photosRef,
       (snapshot) => {
         this.markInitialized();
         const photos: Photo[] = snapshot.exists()
-          ? Object.values(snapshot.val() || {})
+          ? (Object.values(snapshot.val() || {}) as Photo[])
           : [];
         this.photosSubject.next(photos);
         localStorage.setItem('retro_photos', JSON.stringify(photos));
@@ -78,6 +97,9 @@ export class FirebaseService {
    * Ecoute les changements sur les images du header en temps réel
    */
   private listenToHeaderImages(): void {
+    if (!this.db) {
+      return;
+    }
     const headerRef = dbRef(this.db, 'headerImages');
     onValue(
       headerRef,
@@ -150,13 +172,16 @@ export class FirebaseService {
    */
   async addPhoto(photo: Photo): Promise<void> {
     try {
+      if (!this.db) {
+        throw new Error('Firebase non configuré');
+      }
       const photoId = photo.id;
       const photosRef = dbRef(this.db, `photos/${photoId}`);
       await set(photosRef, photo);
 
-      // Mettre à jour le sujet local
+      // Mettre à jour le sujet local - ajouter EN DÉBUT (pas en fin)
       const current = this.photosSubject.value;
-      this.photosSubject.next([...current, photo]);
+      this.photosSubject.next([photo, ...current]);
 
       // Sauvegarder aussi dans localStorage comme backup
       const all = this.photosSubject.value;
@@ -172,6 +197,9 @@ export class FirebaseService {
    */
   async updatePhoto(id: string, photo: Partial<Photo>): Promise<void> {
     try {
+      if (!this.db) {
+        throw new Error('Firebase non configuré');
+      }
       const photoRef = dbRef(this.db, `photos/${id}`);
       await update(photoRef, photo as any);
 
@@ -195,6 +223,9 @@ export class FirebaseService {
    */
   async deletePhoto(id: string): Promise<void> {
     try {
+      if (!this.db) {
+        throw new Error('Firebase non configuré');
+      }
       const photoRef = dbRef(this.db, `photos/${id}`);
       await remove(photoRef);
       await this.deletePhotoFile(id);
@@ -224,6 +255,9 @@ export class FirebaseService {
    */
   async updateHeaderImages(images: string[]): Promise<void> {
     try {
+      if (!this.db) {
+        throw new Error('Firebase non configuré');
+      }
       const headerRef = dbRef(this.db, 'headerImages');
       await set(headerRef, images);
 
@@ -242,6 +276,9 @@ export class FirebaseService {
    * Remplace toutes les photos dans Firebase
    */
   async replacePhotos(photos: Photo[]): Promise<void> {
+    if (!this.db) {
+      throw new Error('Firebase non configuré');
+    }
     const photosRecord = photos.reduce(
       (acc, photo) => ({ ...acc, [photo.id]: photo }),
       {} as Record<string, Photo>
@@ -254,13 +291,16 @@ export class FirebaseService {
    * Vérifie si Firebase est initialisé
    */
   isReady(): boolean {
-    return this.isInitialized;
+    return this.isInitialized && !this.firebaseDisabled;
   }
 
   /**
    * Upload un fichier de photo dans Firebase Storage et retourne l'URL
    */
   async uploadPhotoFile(file: File, photoId: string): Promise<string> {
+    if (!this.storage) {
+      throw new Error('Firebase Storage non configuré');
+    }
     const path = `photos/${photoId}`;
     const photoStorageRef = storageRef(this.storage, path);
     await uploadBytes(photoStorageRef, file);
@@ -272,6 +312,9 @@ export class FirebaseService {
    */
   async deletePhotoFile(photoId: string): Promise<void> {
     try {
+      if (!this.storage) {
+        return;
+      }
       const photoStorageRef = storageRef(this.storage, `photos/${photoId}`);
       await deleteObject(photoStorageRef);
     } catch (error) {

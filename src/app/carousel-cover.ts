@@ -11,11 +11,15 @@ export class CarouselCoverDirective implements OnInit {
 
   constructor(private el: ElementRef<HTMLImageElement>) {}
 
+  setBackgroundImage(imagePath: string) {
+    this.el.nativeElement.src = imagePath;
+  }
+
   ngOnInit(): void {
     if (!this.carouselImages.length) return;
 
     // Première image
-    this.el.nativeElement.src = this.carouselImages[0];
+    this.setBackgroundImage(this.carouselImages[0]);
 
     this.startCarousel();
   }
@@ -36,7 +40,7 @@ export class CarouselCoverDirective implements OnInit {
         img.classList.remove('carousel-slide-out');
         img.classList.add('carousel-slide-in');
 
-        img.src = this.carouselImages[this.currentIndex];
+        this.setBackgroundImage(this.carouselImages[this.currentIndex]);
 
         // Lancer l'entrée fluide
         requestAnimationFrame(() => {

@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CarouselCover } from '../../carousel-cover';
 import { AdminService, Photo } from '../../services/admin.service';
+import { SchemaService } from '../../services/schema.service';
 
 @Component({
   selector: 'app-accueil.component',
@@ -11,8 +12,11 @@ import { AdminService, Photo } from '../../services/admin.service';
   styleUrl: './accueil.component.css',
 })
 export class AccueilComponent implements OnInit {
+  readonly theForkUrl =
+    'https://widget.thefork.com/cb5cfd2d-88a4-438f-8cd9-6d5b551c63cd';
   showHours = false;
   sectionActive: string = '';
+  menuOpen = false;
   photos: Photo[] = [];
   photosEvenements: Photo[] = [];
   headerImages: string[] = [];
@@ -39,9 +43,17 @@ export class AccueilComponent implements OnInit {
     },
   ];
 
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private schemaService: SchemaService
+  ) {}
 
   ngOnInit(): void {
+    // Ajouter les schémas structurés pour le SEO
+    this.schemaService.addRestaurantSchema();
+    this.schemaService.addOrganizationSchema();
+    this.schemaService.addLocalBusinessSchema();
+
     this.loadData();
 
     const hour = new Date().getHours();
@@ -74,11 +86,23 @@ export class AccueilComponent implements OnInit {
 
   afficherSection(section: string) {
     this.sectionActive = section;
+    this.menuOpen = false;
 
     // Recharger les données quand on affiche photos/événements
     if (section === 'photos' || section === 'evenements') {
       this.loadData();
     }
+
+    window.setTimeout(() => {
+      document.getElementById(section)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
+  }
+
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
   }
 
   ouvrirLightbox(photo: Photo) {
@@ -100,5 +124,12 @@ export class AccueilComponent implements OnInit {
   fermerLightbox(event?: MouseEvent) {
     event?.stopPropagation();
     this.lightboxActive = false;
+  }
+
+  @HostListener('document:keydown.escape')
+  fermerLightboxAvecEchap() {
+    if (this.lightboxActive) {
+      this.lightboxActive = false;
+    }
   }
 }

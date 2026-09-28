@@ -10,16 +10,22 @@ import { getStorage, provideStorage } from '@angular/fire/storage';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 
 import { routes } from './app.routes';
-import { firebaseConfig } from './config/firebase.config';
+import { firebaseConfig, hasFirebaseConfig } from './config/firebase.config';
+
+const firebaseProviders = hasFirebaseConfig
+  ? [
+      provideFirebaseApp(() => initializeApp(firebaseConfig)),
+      provideDatabase(() => getDatabase()),
+      provideStorage(() => getStorage()),
+      provideAuth(() => getAuth()),
+    ]
+  : [];
 
 export const appConfigComponent: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideFirebaseApp(() => initializeApp(firebaseConfig)),
-    provideDatabase(() => getDatabase()),
-    provideStorage(() => getStorage()),
-    provideAuth(() => getAuth()),
+    ...firebaseProviders,
   ],
 };
